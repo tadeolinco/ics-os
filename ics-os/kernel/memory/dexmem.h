@@ -133,11 +133,11 @@ DWORD *pagedir1;
 extern void enablepaging();
 extern void disablepaging();
 extern void switchuserprocess(void);
-extern inline void storeflags(DWORD *flags);
-extern inline void restoreflags(DWORD flags);
+extern void storeflags(DWORD *flags);
+extern void restoreflags(DWORD flags);
 extern void setpagedir(DWORD *dir);
-inline void startints();
-inline void stopints();
+void startints();
+void stopints();
 
 /*=================================Prototype definitions here==============================*/
 
