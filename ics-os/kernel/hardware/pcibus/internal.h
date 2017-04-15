@@ -14,7 +14,6 @@
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
-#define inline
 #endif
 
 #ifdef HAVE_PM_LINUX_BYTEORDER_H
@@ -43,12 +42,12 @@
 #define le16_to_cpu swab16
 #define le32_to_cpu swab32
 
-static inline word swab16(word w)
+static word swab16(word w)
 {
   return (w << 8) | ((w >> 8) & 0xff);
 }
 
-static inline u32 swab32(u32 w)
+static u32 swab32(u32 w)
 {
   return ((w & 0xff000000) >> 24) |
          ((w & 0x00ff0000) >> 8) |

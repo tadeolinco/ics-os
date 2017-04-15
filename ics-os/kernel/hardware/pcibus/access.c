@@ -203,7 +203,7 @@ void pci_free_dev(struct pci_dev *d)
   pci_mfree(d);
 }
 
-static inline void
+static void
 pci_read_data(struct pci_dev *d, void *buf, int pos, int len)
 {
   if (pos & (len-1))
@@ -244,7 +244,7 @@ pci_read_block(struct pci_dev *d, int pos, byte *buf, int len)
   return d->methods->read(d, pos, buf, len);
 }
 
-static inline int
+static int
 pci_write_data(struct pci_dev *d, void *buf, int pos, int len)
 {
   if (pos & (len-1))
