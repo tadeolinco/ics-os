@@ -26,6 +26,7 @@ install: vmdex
 	cp lib/* mnt/lib/
 	umount mnt
 	chmod 666 ics-os-floppy.img
+	qemu-system-x86_64 -fda ics-os-floppy.img
 
 floppy: install
 	dd if=ics-os-floppy.img of=/dev/fd0 bs=1440
