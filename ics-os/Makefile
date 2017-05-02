@@ -28,6 +28,10 @@ install: vmdex
 	chmod 666 ics-os-floppy.img
 	qemu-system-x86_64 -fda ics-os-floppy.img
 
+start:
+	make clean
+	sudo make install
+
 floppy: install
 	dd if=ics-os-floppy.img of=/dev/fd0 bs=1440
 
