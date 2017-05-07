@@ -23,10 +23,11 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
    ==========================================================================
-*/
+1*/
 
 #include "console.h"
-  
+
+
 /*A console mode get string function terminates
 upon receving \r */
 void getstring(char *buf,DEX32_DDL_INFO *dev)
@@ -36,11 +37,84 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
     do
     {
     c=getch();
-    if (c=='\r'||c=='\n'||c==0xa) break;
-    if (c=='\b' || (unsigned char)c == 145)
+    if (c=='\t') {
+        const int commands_len = 47;
+        const char *commands[commands_len];
+        commands[0] = "cal";
+        commands[1] = "cat";
+        commands[2] = "cd";
+        commands[3] = "cls";
+        commands[4] = "copy";
+        commands[5] = "cpuid";
+        commands[6] = "date";
+        commands[7] = "del";
+        commands[8] = "demo_graphics";
+        commands[9] = "dir";
+        commands[10] = "echo";
+        commands[11] = "exit";
+        commands[12] = "fgman";
+        commands[13] = "files";
+        commands[14] = "find";
+        commands[15] = "help";
+        commands[16] = "kill";
+        commands[17] = "libinfo";
+        commands[18] = "loadmod";
+        commands[19] = "ls";
+        commands[20] = "lsext";
+        commands[21] = "lsdev";
+        commands[22] = "lsmod";
+        commands[23] = "lspcut";
+        commands[24] = "mem";
+        commands[25] = "mkdir";
+        commands[26] = "mount";
+        commands[27] = "mouse";
+        commands[28] = "meminfo";
+        commands[29] = "newconsole";
+        commands[30] = "off";
+        commands[31] = "path";
+        commands[32] = "pause";
+        commands[33] = "pcut";
+        commands[34] = "procinfo";
+        commands[35] = "procs";
+        commands[36] = "rempcut";
+        commands[37] = "ren";
+        commands[38] = "rmdir";
+        commands[39] = "run";
+        commands[40] = "set";
+        commands[41] = "shutdown";
+        commands[42] = "time";
+        commands[43] = "type";
+        commands[44] = "umount";
+        commands[45] = "unload";
+        commands[46] = "use";
+        commands[47] = "ver";
+
+        int buf_len = i;
+        char subbuf[buf_len];
+        for (int index=0; index<commands_len; ++index) {
+            if (strlen(commands[index]) > buf_len) {
+                memcpy(subbuf, &(commands[index])[0], buf_len);
+                subbuf[buf_len] = 0;
+                buf[buf_len] = 0;
+                if (strcmp(buf, subbuf) == 0) {
+                    for (int j=buf_len; j<strlen(commands[index]); ++j) {
+                        Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),commands[index][j],Dex32GetAttb(dev));
+                        buf[i] = commands[index][j];
+                        i++;
+                        Dex32SetX(dev,Dex32GetX(dev)+1);   
+                    }
+                    buf[i]='\0';
+                    break;
+                }
+            }
+        }
+    }
+    else if (c=='\r'||c=='\n'||c==0xa) break;
+    else if (c=='\b' || (unsigned char)c == 145)
        {
        if(i>0)
         {
+        buf[i] = '\0';
         i--;
 
         if (Dex32GetX(dev)==0)
@@ -61,8 +135,11 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
             Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),buf[i]=c,Dex32GetAttb(dev));
             i++;
             Dex32SetX(dev,Dex32GetX(dev)+1);     
-            if (Dex32GetX(dev)>79) {Dex32SetX(dev,0);
-            Dex32NextLn(dev);};
+            
+            if (Dex32GetX(dev)>79) {
+                Dex32SetX(dev,0);
+                Dex32NextLn(dev);
+            };
          };
        };
 
@@ -507,6 +584,88 @@ void console_ls(int style, int sortmethod)
     free(buffer);
     
 };
+// http://www.stoimen.com/blog/2012/04/24/computer-algorithms-how-to-determine-the-day-of-the-week/
+
+int get_century_code(int year) {
+    int century = 0;
+    int code = 6;
+    while (1) {
+        if (century <= year && year < century+100) {
+            return code;
+        }
+        century += 100;
+        if (code == 0) code = 6;
+        else code -= 2;
+    }
+}
+
+int get_month_code(int month, int year) {
+    int code[12] = {1,4,4,0,2,5,0,3,6,1,4,6};
+
+    if (year % 4 == 0 && year % 100 != 0 && (month == 1 || month == 2)) {
+        return code[month-1]-1;
+    } else {
+        return code[month-1];
+    }
+}
+
+int starting_day(int month, int year) {
+    int day = (((year % 100)/4)+1+get_month_code(month, year)
+    +get_century_code(year)+(year % 100)) % 7;
+
+    return day;
+}
+
+void cal(int month, int year) {
+    switch (month) {
+        case 1: printf("\tJanuary"); break;
+        case 2: printf("\tFebruary"); break;
+        case 3: printf("\t\tMarch"); break;
+        case 4: printf("\t\tApril"); break;
+        case 5: printf("\t\tMay"); break;
+        case 6: printf("\t\tJune"); break;
+        case 7: printf("\t\tJuly"); break;
+        case 8: printf("\tAugust"); break;
+        case 9: printf("\tSeptember"); break;
+        case 10: printf("\tOctober"); break;
+        case 11: printf("\tNovember"); break;
+        case 12: printf("\tDecember"); break;
+    }
+    printf(" %d\n", year);
+    printf("Su Mo Tu We Th Fr Sa\n");
+
+    int days_in_months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int start_day = starting_day(month, year);
+    int day = 1;
+    int days_in_month = days_in_months[month-1];
+    if (year % 4 == 0 && year % 100 != 0 && month == 2) {
+        days_in_month++;
+    }
+    for (int i=0; i<start_day-1; ++i) {
+        printf("   ");
+        day++;
+    }
+    for (int date=1; date<days_in_month+1; ++date) {
+        if (date == time_systime.day && month == time_systime.month && year == time_systime.year) {
+            textbackground(WHITE);
+            textcolor(BLACK);
+        }
+        if (date < 10) {
+            printf(" ");
+        }
+        printf("%d", date);
+        textbackground(BLACK);
+        textcolor(WHITE);
+        printf(" ");
+        if (day % 7 == 0) {
+            printf("\n");
+        }
+        day++;
+    }
+    if (day != 7) {
+        printf("\n");
+    }
+}
 
 /* ==================================================================
    console_execute(const char *str):
@@ -936,6 +1095,33 @@ int console_execute(const char *str)
               }
     
               else
+    if (strcmp(u, "cal") == 0) {
+        char* firstParam;
+        u = strtok(0, " ");
+        firstParam = u;
+        u = strtok(0, " ");
+        if (firstParam != 0) {
+            if (u != 0) {
+                // two params
+                cal(atoi(firstParam), atoi(u));
+            } else {
+                // one params
+                if (strcmp(firstParam, "-h") == 0) {
+                    printf("The command shows a formatted calendar\n");
+                    printf("Possible options:\n");
+                    printf("\tcal -h - shows this message\n");
+                    printf("\tcal <year> - shows the calendar for the whole specific year\n");
+                    printf("\tcal <month> <year> - shows the the calendar for that month of that year\n");
+                } else {
+                    printf("%s\n", firstParam);
+                }
+
+            }
+        } else {
+            // no params
+            cal(time_systime.month, time_systime.year);
+        }
+    } else
     if (u[0]=='$')
              {
                int i, devid;
