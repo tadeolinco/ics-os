@@ -32,82 +32,133 @@
 upon receving \r */
 void getstring(char *buf,DEX32_DDL_INFO *dev)
   {
+    memset(buf, 0, 255);
     unsigned int i=0;
     char c;
+    const int commands_len = 47;
+    const char *commands[commands_len];
+    commands[0] = "cal";
+    commands[1] = "cat";
+    commands[2] = "cd";
+    commands[3] = "cls";
+    commands[4] = "copy";
+    commands[5] = "cpuid";
+    commands[6] = "date";
+    commands[7] = "del";
+    commands[8] = "demo_graphics";
+    commands[9] = "dir";
+    commands[10] = "echo";
+    commands[11] = "exit";
+    commands[12] = "fgman";
+    commands[13] = "files";
+    commands[14] = "find";
+    commands[15] = "help";
+    commands[16] = "kill";
+    commands[17] = "libinfo";
+    commands[18] = "loadmod";
+    commands[19] = "ls";
+    commands[20] = "lsext";
+    commands[21] = "lsdev";
+    commands[22] = "lsmod";
+    commands[23] = "lspcut";
+    commands[24] = "mem";
+    commands[25] = "mkdir";
+    commands[26] = "mount";
+    commands[27] = "mouse";
+    commands[28] = "meminfo";
+    commands[29] = "newconsole";
+    commands[30] = "off";
+    commands[31] = "path";
+    commands[32] = "pause";
+    commands[33] = "pcut";
+    commands[34] = "procinfo";
+    commands[35] = "procs";
+    commands[36] = "rempcut";
+    commands[37] = "ren";
+    commands[38] = "rmdir";
+    commands[39] = "run";
+    commands[40] = "set";
+    commands[41] = "shutdown";
+    commands[42] = "time";
+    commands[43] = "type";
+    commands[44] = "umount";
+    commands[45] = "unload";
+    commands[46] = "use";
+    commands[47] = "ver";
     do
     {
     c=getch();
     if (c=='\t') {
-        const int commands_len = 47;
-        const char *commands[commands_len];
-        commands[0] = "cal";
-        commands[1] = "cat";
-        commands[2] = "cd";
-        commands[3] = "cls";
-        commands[4] = "copy";
-        commands[5] = "cpuid";
-        commands[6] = "date";
-        commands[7] = "del";
-        commands[8] = "demo_graphics";
-        commands[9] = "dir";
-        commands[10] = "echo";
-        commands[11] = "exit";
-        commands[12] = "fgman";
-        commands[13] = "files";
-        commands[14] = "find";
-        commands[15] = "help";
-        commands[16] = "kill";
-        commands[17] = "libinfo";
-        commands[18] = "loadmod";
-        commands[19] = "ls";
-        commands[20] = "lsext";
-        commands[21] = "lsdev";
-        commands[22] = "lsmod";
-        commands[23] = "lspcut";
-        commands[24] = "mem";
-        commands[25] = "mkdir";
-        commands[26] = "mount";
-        commands[27] = "mouse";
-        commands[28] = "meminfo";
-        commands[29] = "newconsole";
-        commands[30] = "off";
-        commands[31] = "path";
-        commands[32] = "pause";
-        commands[33] = "pcut";
-        commands[34] = "procinfo";
-        commands[35] = "procs";
-        commands[36] = "rempcut";
-        commands[37] = "ren";
-        commands[38] = "rmdir";
-        commands[39] = "run";
-        commands[40] = "set";
-        commands[41] = "shutdown";
-        commands[42] = "time";
-        commands[43] = "type";
-        commands[44] = "umount";
-        commands[45] = "unload";
-        commands[46] = "use";
-        commands[47] = "ver";
+        char temp[256];
+        strcpy(temp, buf);
+        char *u = strtok(temp, " ");
+        char *last_input;
+        strcpy(last_input, u);
+        int input_len = 0;
+        int buf_len = 0;
+        while (u != 0) {
+            input_len++;
+            buf_len = strlen(u);
+            strcpy(last_input, u);
+            u = strtok(0, " ");
+        }
 
-        int buf_len = i;
-        char subbuf[buf_len];
-        for (int index=0; index<commands_len; ++index) {
-            if (strlen(commands[index]) > buf_len) {
-                memcpy(subbuf, &(commands[index])[0], buf_len);
-                subbuf[buf_len] = 0;
-                buf[buf_len] = 0;
-                if (strcmp(buf, subbuf) == 0) {
-                    for (int j=buf_len; j<strlen(commands[index]); ++j) {
-                        Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),commands[index][j],Dex32GetAttb(dev));
-                        buf[i] = commands[index][j];
+        char sub_buf[buf_len];
+        if (input_len == 1) {
+            for (int index=0; i<commands_len; ++index) {
+                if (strlen(commands[index] > buf_len)) {
+                    memcpy(sub_buf, commands[index], buf_len);
+                    sub_buf[buf_len] = 0;
+                    if (strcmp(last_input, sub_buf) == 0) {
+                        for (int j=buf_len; j<strlen(commands[index]); ++j) {
+                            Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),commands[index][j],Dex32GetAttb(dev));
+                            buf[i] = commands[index][j];
+                            i++;
+                            Dex32SetX(dev,Dex32GetX(dev)+1);  
+                        }
+                        Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),' ',Dex32GetAttb(dev));
+                        buf[i] = ' ';
                         i++;
-                        Dex32SetX(dev,Dex32GetX(dev)+1);   
+                        Dex32SetX(dev,Dex32GetX(dev)+1);  
                     }
-                    buf[i]='\0';
                     break;
                 }
             }
+        } else if (input_len > 1) {
+            vfs_node *dptr = current_process->workdir;
+            vfs_node *buffer;
+            int totalfiles = vfs_listdir(dptr, 0, 0);
+            buffer = (vfs_node*) malloc(totalfiles * sizeof(vfs_node));
+            totalfiles = vfs_listdir(dptr, buffer, totalfiles*sizeof(vfs_node));
+            qsort(buffer, totalfiles, sizeof(vfs_node), console_ls_sortname);
+
+            for (int index=0; index<totalfiles; ++index) {
+                if (strlen(buffer[index].name) > buf_len) {
+                    char fname[255];
+                    strcpy(fname, buffer[index].name);
+                    fname[24] = 0;
+                    memcpy(sub_buf, fname, buf_len);
+                    sub_buf[buf_len] = 0;
+                    if (strcmp(last_input, sub_buf) == 0) {
+                        while (buf_len < strlen(fname)) { // why wont for loops work
+                            Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),fname[buf_len],Dex32GetAttb(dev));
+                            buf[i] = fname[buf_len];
+                            i++;
+                            Dex32SetX(dev,Dex32GetX(dev)+1);   
+                            buf_len++;
+                        }
+                        Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),' ',Dex32GetAttb(dev));
+                        buf[i] = ' ';
+                        i++;
+                        Dex32SetX(dev,Dex32GetX(dev)+1);  
+                        break;
+                    }
+                }
+            }
+            free(buffer);
         }
+        memset(last_input, 0, buf_len);
+        memset(sub_buf, 0, buf_len);
     }
     else if (c=='\r'||c=='\n'||c==0xa) break;
     else if (c=='\b' || (unsigned char)c == 145)
