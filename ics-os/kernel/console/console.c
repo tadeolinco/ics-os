@@ -502,6 +502,41 @@ void prompt_parser(const char *promptstr,char *prompt)
     };
 
   };
+
+  char * getDay(int day){
+      char * daystr;
+       switch(day){
+            case 0: strcpy(daystr,"Sunday");break;
+            case 1: strcpy(daystr,"Monday");break;
+            case 2: strcpy(daystr,"Tuesday");break;
+            case 3: strcpy(daystr,"Wednesday");break;
+            case 4: strcpy(daystr,"Thursday");break;
+            case 5: strcpy(daystr,"Friday");break;
+            case 6: strcpy(daystr,"Saturday");break;
+        }
+        return daystr;
+  };
+
+  char *getMonth(int month)
+  {
+      char *str;
+     switch (month)
+       {
+         case 1 : strcpy(str,"January"); break;
+         case 2 : strcpy(str,"Febuary"); break;
+         case 3 : strcpy(str,"March");break;
+         case 4 : strcpy(str,"April");break;
+         case 5 : strcpy(str,"May");break;
+         case 6 : strcpy(str,"June");break;
+         case 7 : strcpy(str,"July");break;
+         case 8 : strcpy(str,"August");break;
+         case 9 : strcpy(str,"September");break;
+         case 10: strcpy(str,"October");break;
+         case 11: strcpy(str,"November");break;
+         case 12: strcpy(str,"Decemeber");break;
+       };
+    return str;
+  };
   
 
 
@@ -1217,6 +1252,100 @@ int console_execute(const char *str)
                       time_systime.sec,time());
              }
              else
+    if(strcmp(u,"date")==0)
+            {
+                u=strtok(0," ");
+                // <day> <month> <date> <hour>:<minute>:<second> <timezone> <year>
+
+                if(u==0){
+
+                     switch(starting_day(time_systime.month,time_systime.year)+1){
+                        case 0: printf("Sunday ");break;
+                        case 1: printf("Monday ");break;
+                        case 2: printf("Tuesday ");break;
+                        case 3: printf("Wednesday ");break;
+                        case 4: printf("Thursday ");break;
+                        case 5: printf("Friday ");break;
+                        case 6: printf("Saturday ");break;
+                    }
+
+                    switch(time_systime.month){
+                        case 1: printf("January ");break;
+                        case 2: printf("February ");break;
+                        case 3: printf("March ");break;
+                        case 4: printf("April ");break;
+                        case 5: printf("May ");break;
+                        case 6: printf("June ");break;
+                        case 7: printf("July ");break;
+                        case 8: printf("August ");break;
+                        case 9: printf("September ");break;
+                        case 10: printf("October ");break;
+                        case 11: printf("November ");break;
+                        case 12: printf("December ");break;
+                    }
+
+                    
+                    printf("%d %dH:%dM:%dS %d \n",  
+                        time_systime.day,
+                        time_systime.hour,
+                        time_systime.min,
+                        time_systime.sec,
+                        time_systime.year);
+
+                }
+                else if(strcmp(u,"-h")==0){
+                    printf("date - the command shows the current time\n");
+                    printf("date -h - shows this message\n");
+                    printf("date <format> - shows current date in specified format\n");
+                    printf("Possible Format:\n");
+                    printf("\t %%b - abbreviated month name (Jan)\n");
+                    printf("\t %%B - full month name (January)\n");
+                    printf("\t %%m - month (01..12)\n");
+                    printf("\t %%y - last two digits of the year (00..99)\n");
+                    printf("\t %%Y - year\n");
+
+                    
+                }
+                else{
+                    while(u!=0){
+                        if(strcmp(u,"%b")==0){
+                            char * str;
+                            getmonthname(time_systime.month,str);
+                            str[3]=0;
+                            printf("%s ",str);
+                        }
+                        if(strcmp(u,"%B")==0){
+                            char * str;
+                            getmonthname(time_systime.month,str);
+                            printf("%s ",str);
+                        }
+                        if(strcmp(u,"%m")==0){
+                            if(time_systime.month < 10){
+                                printf("0%d ",time_systime.month);
+                            }
+                            else{
+                                printf("%d ",time_systime.month);
+                            }
+                        }
+                        if(strcmp(u,"%y")==0){
+                            if(time_systime.year%100 <10){
+                                printf("0%d ",time_systime.year%100);
+                            }
+                            else{
+                                printf("%d ",time_systime.year%100);
+                                }
+                        }
+                        if(strcmp(u,"%Y")==0){
+                            printf("%d ",time_systime.year);
+                        }
+
+                        
+                        u=strtok(0," ");
+                    }
+                    printf("\n");
+                }
+            }
+            else
     if (strcmp(u,"set")==0)
              {
               u=strtok(0," ");
