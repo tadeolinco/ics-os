@@ -1,18 +1,39 @@
-##About
+# ics-os
 
-Modern real-world operating systems are too complex to be taught to undergraduates and other instructional operating systems are not complete and usable and do not work on real hardware. By providing students with a _not so complex_ working operating system to play with, they will be able to appreciate and understand deeper the concepts underlying an operating system.
+## Features
 
-Thus, this project aims to develop a simple yet operational instructional operating system for teaching undergraduate operating systems courses. ICS-OS is a fork of <a href='http://sourceforge.net/projects/dex-os'>DEX-OS</a> by Joseph Dayo.
+### 1. Autocomplete
 
-## Downloads
+Press tab to autocomplete the current input.
 
-Latest floppy image: <a href='https://github.com/srg-ics-uplb/ics-os/raw/master/ics-os/ics-os-floppy.img'>ics-os-floppy.img</a>
+The input will not be autocompleted if there is no input or the last character is whitespace.
 
-The source code in .tar.gz format is availabe in the <a href='https://github.com/srg-ics-uplb/ics-os/releases'>releases</a> section.
+The first input will always autocomplete from all possible commands in the OS. The rest of the inputs will be autocompleted from all the files in the working directory. The chosen command or file to be autocompleted from is chosen alphabetically.
 
-## Development and Support
-This project is maintained and used by the <a href='http://ics.uplb.edu.ph'>Institute of Computer Science</a>, <a href='http://www.uplb.edu.ph'>University of the Philippines Los Banos</a> for <a href='http://ics.uplb.edu.ph/courses/ugrad/cmsc/125'>CMSC 125</a>.
+### 2. cal
 
-Dont forget to check the <a href="http://github.com/srg-ics-uplb/ics-os/wiki">Wiki</a>.
+#### How to run:
+Prints the calendar of the current month of the current year:
+```shell
+cal 
+```
 
-You can ask questions <a href="https://groups.google.com/forum/#!forum/ics-os">here</a>.
+Prints the calendar of the specified month of the specified year:
+```shell
+// cal <month> <year>
+cal 5 2017
+```
+
+Prints the calendar of the all the months of the specified year:
+```shell
+// cal <year>
+cal 2017
+```
+
+Prints all possible options for the command
+```
+cal -h
+```
+
+### 3. date
+
