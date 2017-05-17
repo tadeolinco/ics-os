@@ -668,53 +668,155 @@ int starting_day(int month, int year) {
 }
 
 void cal(int month, int year) {
-    switch (month) {
-        case 1: printf("\tJanuary"); break;
-        case 2: printf("\tFebruary"); break;
-        case 3: printf("\t\tMarch"); break;
-        case 4: printf("\t\tApril"); break;
-        case 5: printf("\t\tMay"); break;
-        case 6: printf("\t\tJune"); break;
-        case 7: printf("\t\tJuly"); break;
-        case 8: printf("\tAugust"); break;
-        case 9: printf("\tSeptember"); break;
-        case 10: printf("\tOctober"); break;
-        case 11: printf("\tNovember"); break;
-        case 12: printf("\tDecember"); break;
-    }
-    printf(" %d\n", year);
-    printf("Su Mo Tu We Th Fr Sa\n");
+    if (month != -1) {
+        switch (month) {
+            case 1: printf("\tJanuary"); break;
+            case 2: printf("\tFebruary"); break;
+            case 3: printf("\t\tMarch"); break;
+            case 4: printf("\t\tApril"); break;
+            case 5: printf("\t\tMay"); break;
+            case 6: printf("\t\tJune"); break;
+            case 7: printf("\t\tJuly"); break;
+            case 8: printf("\tAugust"); break;
+            case 9: printf("\tSeptember"); break;
+            case 10: printf("\tOctober"); break;
+            case 11: printf("\tNovember"); break;
+            case 12: printf("\tDecember"); break;
+        }
+        printf(" %d\n", year);
+        printf("Su Mo Tu We Th Fr Sa\n");
 
-    int days_in_months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int start_day = starting_day(month, year);
-    int day = 1;
-    int days_in_month = days_in_months[month-1];
-    if (year % 4 == 0 && year % 100 != 0 && month == 2) {
-        days_in_month++;
-    }
-    for (int i=0; i<start_day-1; ++i) {
-        printf("   ");
-        day++;
-    }
-    for (int date=1; date<days_in_month+1; ++date) {
-        if (date == time_systime.day && month == time_systime.month && year == time_systime.year) {
-            textbackground(WHITE);
-            textcolor(BLACK);
+        int days_in_months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        int start_day = starting_day(month, year);
+        int day = 1;
+        int days_in_month = days_in_months[month-1];
+        if (year % 4 == 0 && year % 100 != 0 && month == 2) {
+            days_in_month++;
         }
-        if (date < 10) {
+        for (int i=0; i<start_day-1; ++i) {
+            printf("   ");
+            day++;
+        }
+        for (int date=1; date<days_in_month+1; ++date) {
+            if (date == time_systime.day && month == time_systime.month && year == time_systime.year) {
+                textbackground(WHITE);
+                textcolor(BLACK);
+            }
+            if (date < 10) {
+                printf(" ");
+            }
+            printf("%d", date);
+            textbackground(BLACK);
+            textcolor(WHITE);
             printf(" ");
+            if (day % 7 == 0) {
+                printf("\n");
+            }
+            day++;
         }
-        printf("%d", date);
-        textbackground(BLACK);
-        textcolor(WHITE);
-        printf(" ");
-        if (day % 7 == 0) {
+        if (day != 7) {
             printf("\n");
         }
-        day++;
-    }
-    if (day != 7) {
-        printf("\n");
+    } else {
+        printf("                             %d\n", year);
+        char *months[12] = {
+            "       January", "              February", "               March",
+            "       April", "                  May", "                   June",
+            "        July", "                 August", "              September",
+            "      October", "               November", "              December"
+        };
+        char *days = "Su Mo Tu We Th Fr Sa  ";
+        int days_in_month[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        int start_day[12] = {0}; memset(start_day, 0, 12);
+        int day[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int spaced[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int date[12] = {1,1,1,1,1,1,1,1,1,1,1,1};
+
+        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
+            days_in_month[1]++;
+        }
+
+        for (int month=0; month<12; ++month) {
+            start_day[month] = starting_day(month+1, year);
+        }
+
+        for (int row=0; row<4; ++row) {
+            for (int col=0; col<3; ++col) {
+                int month = row*3+col;
+                printf("%s", months[month]);
+            }
+            printf("\n");
+            
+            for (int col=0; col<3; ++col) {
+                printf("%s", days);
+            }
+            printf("\n");
+            for (int i=0; i<6; ++i) {
+                int done = 1;
+                for (int col=0; col<3; ++col) {
+                    int month = row*3+col;
+                    if (date[month] <= days_in_month[month]) {
+                        done = 0;
+                        break;
+                    }
+                }
+                if (done) {
+                    continue;
+                }
+
+                for (int col=0; col<3; ++col) {
+                    int month = row*3+col;
+
+                    if (!spaced[month]) {
+                        for (int i=0; i<start_day[month]-1; ++i) {
+                            printf("   ");
+                            day[month]++;
+                        }
+                        spaced[month] = 1;
+                    }
+
+                    if (date[month] <= days_in_month[month]) {
+                        int first = 1;
+                        while (first || day[month] % 7 != 0) {
+                            first = 0;
+                            if (date[month] == time_systime.day && month+1 == time_systime.month && year == time_systime.year) {
+                                textbackground(WHITE);
+                                textcolor(BLACK);
+                            }
+                            if (date[month] < 10) {
+                                printf(" ");
+                            }
+
+                            printf("%d", date[month]);
+                            textbackground(BLACK);
+                            textcolor(WHITE);   
+                            printf(" ");
+
+                            day[month]++;
+                            date[month]++;
+                            if (date[month] > days_in_month[month]) {
+                                if (day[month]%7 != 0) {
+                                    for (int j=0; j<7-(day[month]%7); ++j) {
+                                        printf("   ");
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    } else {
+                        printf("                     ");
+                    }
+                    printf(" ");
+                        
+                }
+                printf("\n");
+
+            }
+            printf("\n");
+            if (row < 3) {
+                getch();
+            }
+        }
     }
 }
 
@@ -1164,7 +1266,8 @@ int console_execute(const char *str)
                     printf("\tcal <year> - shows the calendar for the whole specific year\n");
                     printf("\tcal <month> <year> - shows the the calendar for that month of that year\n");
                 } else {
-                    printf("%s\n", firstParam);
+                    printf("\nYear: %s\n", firstParam);
+                    cal(-1, atoi(firstParam));
                 }
 
             }
