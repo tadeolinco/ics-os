@@ -31,9 +31,33 @@ cal 2017
 ```
 
 Prints all possible options for the command
-```
+```shell
 cal -h
 ```
 
 ### 3. date
+
+### How to run:
+Prints the current date
+```shell
+date
+```
+
+Prints the current in the specified format.
+Possible formats are:
+* %b - abbreviated month name
+* %B - full month name (January)
+* %m - month (01..12)
+* %y - lsat two digits of the year (00..99)
+* %Y - year
+```shell
+// date <format>
+date %b %Y
+```
+
+Prints all possible options for the command
+```shell
+date -h
+```
+
 
