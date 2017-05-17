@@ -37,7 +37,7 @@ cal -h
 
 ### 3. date
 
-### How to run:
+#### How to run:
 Prints the current date
 ```shell
 date
