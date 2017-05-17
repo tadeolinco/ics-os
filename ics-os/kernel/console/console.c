@@ -32,11 +32,13 @@
 upon receving \r */
 void getstring(char *buf,DEX32_DDL_INFO *dev)
   {
+    // resets buff
     memset(buf, 0, 255);
     unsigned int i=0;
     char c;
     const int commands_len = 47;
     const char *commands[commands_len];
+    // all commands in OS
     commands[0] = "cal";
     commands[1] = "cat";
     commands[2] = "cd";
@@ -96,8 +98,9 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
         strcpy(last_input, u);
         int input_len = 0;
         int buf_len = 0;
-        while (u != 0) {
-            input_len++;
+
+        while (u != 0) { // counts number of words in buf and
+            input_len++; // catches the last word as p
             buf_len = strlen(u);
             strcpy(last_input, u);
             u = strtok(0, " ");
@@ -105,11 +108,16 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
 
         char sub_buf[buf_len];
         if (input_len == 1) {
+            // iterate over all commands
             for (int index=0; i<commands_len; ++index) {
+                // if current command's length is greater than the last word's length
                 if (strlen(commands[index] > buf_len)) {
+                    // copy up to last word's length the contents of the command in to subbuf
                     memcpy(sub_buf, commands[index], buf_len);
                     sub_buf[buf_len] = 0;
+                    // compare subbuf to the last input
                     if (strcmp(last_input, sub_buf) == 0) {
+                        // if so, iterate each letter to add to the terminal and to buf
                         for (int j=buf_len; j<strlen(commands[index]); ++j) {
                             Dex32PutChar(dev,Dex32GetX(dev),Dex32GetY(dev),commands[index][j],Dex32GetAttb(dev));
                             buf[i] = commands[index][j];
@@ -125,6 +133,7 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
                 }
             }
         } else if (input_len > 1) {
+            // gets the files in working directory as as array of filenames
             vfs_node *dptr = current_process->workdir;
             vfs_node *buffer;
             int totalfiles = vfs_listdir(dptr, 0, 0);
@@ -132,11 +141,14 @@ void getstring(char *buf,DEX32_DDL_INFO *dev)
             totalfiles = vfs_listdir(dptr, buffer, totalfiles*sizeof(vfs_node));
             qsort(buffer, totalfiles, sizeof(vfs_node), console_ls_sortname);
 
+            // iterate over all filenames
             for (int index=0; index<totalfiles; ++index) {
+                // if filename length is longer than the last inputs length
                 if (strlen(buffer[index].name) > buf_len) {
                     char fname[255];
                     strcpy(fname, buffer[index].name);
                     fname[24] = 0;
+                    // copy contents up to last inputs length
                     memcpy(sub_buf, fname, buf_len);
                     sub_buf[buf_len] = 0;
                     if (strcmp(last_input, sub_buf) == 0) {
@@ -1257,8 +1269,9 @@ int console_execute(const char *str)
                 u=strtok(0," ");
                 // <day> <month> <date> <hour>:<minute>:<second> <timezone> <year>
 
-                if(u==0){
+                if(u==0){ // if no params, default
 
+                    // we tried making this a function, it messes up the printing
                      switch(starting_day(time_systime.month,time_systime.year)+1){
                         case 0: printf("Sunday ");break;
                         case 1: printf("Monday ");break;
@@ -1268,7 +1281,7 @@ int console_execute(const char *str)
                         case 5: printf("Friday ");break;
                         case 6: printf("Saturday ");break;
                     }
-
+                    // same as above
                     switch(time_systime.month){
                         case 1: printf("January ");break;
                         case 2: printf("February ");break;
@@ -1293,6 +1306,7 @@ int console_execute(const char *str)
                         time_systime.year);
 
                 }
+                // help
                 else if(strcmp(u,"-h")==0){
                     printf("date - the command shows the current time\n");
                     printf("date -h - shows this message\n");
@@ -1307,6 +1321,7 @@ int console_execute(const char *str)
                     
                 }
                 else{
+                    // iterates over all params, then 
                     while(u!=0){
                         if(strcmp(u,"%b")==0){
                             char * str;
