@@ -48,7 +48,7 @@ Possible formats are:
 * %b - abbreviated month name
 * %B - full month name (January)
 * %m - month (01..12)
-* %y - lsat two digits of the year (00..99)
+* %y - last two digits of the year (00..99)
 * %Y - year
 ```shell
 // date <format>
